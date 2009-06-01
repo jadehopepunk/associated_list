@@ -1,0 +1,57 @@
+AssociatedList
+==============
+
+Demo available at: http://www.craigambrose.com/associated_list_demo 
+
+More description at: http://blog.craigambrose.com/articles/2006/10/09/associated-list-a-little-has-many-widget-for-rails
+
+
+INSTALLING
+
+script/plugin install http://www.tinboxsoftware.com/plugins/show/associated_list/
+
+As I've mentioned before, my svn repository doesn't work with svn externals automatically, but you can do it by hand:
+
+svn propedit svn:externals vendor/plugins/
+
+And then add this line:
+
+associated_list http://svn2.cvsdude.com/craigambrose/plugins/associated_list
+
+If you install with the rails plugin systems, then it will copy a associated_list.css file into your stylesheets directory. If it's not there, or you install via some other method, or you're updating, then do this:
+
+  cd vendor/plugins/associated_list/
+  rake update_scripts
+
+And finally, make sure you include that stylesheet in your layout:
+
+  <%= stylesheet_link_tag 'associated_list' %>
+
+USAGE
+
+If you have a model @widget of class Widget, that has_and_belongs_to_many :categories, then you simply use the form helper as follows (ie: the same as all the other helpers):
+
+  <%= associated_list 'widget', 'categories' %>
+
+When the form is saved, params['widget']['category_ids'] will contain an array of strings representing integer ids of the categories. <strong>Note: </strong> This will include one empty string object. This is to ensure that empty lists get saved, just ignore it.
+
+Now, since your model object has a categories= method, but no category_ids= method, you'll have to create one (in category.rb):
+
+
+  def category_ids=(category_id_array)
+    self.categories = category_id_array.reject{ |category_id| category_id == '' }.collect { |category_id| WidgetCategory.find(category_id.to_i) }
+  end
+
+Not how I'm rejecting that empty string. Everything else is pretty straight forward. Really the plugin should extend the rails association helpers to add this method. If anyone wants to code that for me, drop me a line and I'll patch it into the plugin.
+
+CREDITS
+
+This plugin was factored out of my railsday project, and so appart from some cleanup work and plugin-ification, it was coded by myself, "Nigel Thorne":http://www.nigelthorne.com and Simon Hildebrandt. If you use this plugin, please consider them to rock just as thoroughly as I do. :)
+
+LICENSE
+
+MIT License
+
+http://www.opensource.org/licenses/mit-license.php
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so.
